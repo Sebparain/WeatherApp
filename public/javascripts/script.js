@@ -1,9 +1,4 @@
-var mymap = L.map('worldmap',
-    {
-        center: [48.866667, 2.333333],
-        zoom: 4
-    }
-    );
+var mymap = L.map('worldmap').setView([48.866667, 2.333333], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -23,5 +18,6 @@ for (let i = 0; i < cities.length; i++) {
     var long = cities[i].dataset.long;
     var lat = cities[i].dataset.lat;
     var nom = cities[i].dataset.nom;
+    mymap.setView([lat, long], 4);
     var marker = L.marker([lat, long], {icon: logo}).addTo(mymap).bindPopup(nom)
 }
