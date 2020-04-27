@@ -27,14 +27,18 @@ router.post('/sign-up', async function(req, res, next) {
     var user = new userModel({
       userName: req.body.username,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      cities: []
     });
     //Sauvegarde l'utilisateur dans la base de données
-   user = await user.save();
+   await user.save();
+
+   
     //crée une variable de session pour garder ces informations
    req.session.user = {name: user.userName, id: user._id};
+   var user = await userModel.findOne({userName: req.session.user.name})
    //Redirige moi vers la page weather
-   res.redirect('/weather', {cityList: user.cities, user: req.session.user});
+   res.render('weather', {cityList: user.cities, user: req.session.user});
   }
 });
 
