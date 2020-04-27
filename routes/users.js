@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var cityModel = require('../models/cities');
 var userModel = require('../models/users');
 
 
@@ -35,7 +34,7 @@ router.post('/sign-up', async function(req, res, next) {
     //crée une variable de session pour garder ces informations
    req.session.user = {name: user.userName, id: user._id};
    //Redirige moi vers la page weather
-   res.redirect('/weather');
+   res.redirect('/weather', {cityList: user.cities, user: req.session.user});
   }
 });
 

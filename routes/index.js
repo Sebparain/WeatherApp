@@ -6,7 +6,6 @@ var router = express.Router();
 //mettre la route en asynchorne et la request GET en await et utiliser getBody() au lieu de body.
 //Regarder la documentation pour gestion des erreurs
 var request = require('sync-request');
-var cityModel = require('../models/cities');
 var userModel = require('../models/users');
 
 /* GET home page. */
@@ -22,7 +21,13 @@ router.get('/weather', async function(req, res, next) {
   if(req.session.user == null) {
     res.redirect('/');
   } else {
-    var cities = await cityModel.find();
+    var user = await userModel.findOne({userName: req.session.user.name});
+    if (user.cities != null) {
+      var cities = user.cities;
+    } else {
+      var cities = "";
+    }
+    
   res.render('weather', { title: 'Express', cityList: cities, user: req.session.user});
   }
   
@@ -36,16 +41,19 @@ router.post('/add-city', async function(req, res, next) {
   //On fait de la réponse quelque chose qu'on pourra utiliser donc un objet
   city = JSON.parse(city.body);
   //On va chercher sur le MONGODB la liste des villes déjà dans la base de données
-  var cities = await cityModel.find();
+  var user = await userModel.findOne({userName: req.session.user.name});
   //On initialise une variable qui nous servira pour savoir si la ville est déjà présente
-  var cityAlreadyPresent = await cityModel.findOne({
-    nom: city.name
-  });
-   
+   var cityAlreadyPresent = false;
+
+   for (let i = 0; i < user.cities.length; i++) {
+     if (user.cities[i].nom === city.name) {
+        cityAlreadyPresent = true;
+     }
+   }
     //Si on a pas trouvé le nom de ville dans notre DB et que on a un retour de l'API (city.name = true)
-    if (cityAlreadyPresent === null && city.name) {
+    if (cityAlreadyPresent === false && city.name) {
       //On crée une nouvelle ville selon le modele
-      var newCity = new cityModel({
+      user.cities.push({
         nom: city.name,
         descriptif: city.weather[0].description,
         tMin: city.main.temp_min,
@@ -56,45 +64,54 @@ router.post('/add-city', async function(req, res, next) {
         lat: city.coord.lat
       });
       //On l'ajoute dans notre DB
-      await newCity.save();
+     await user.save();
     } 
     //On refait un tour dans notre DB pour voir quelle est maintenant la nouvelle liste
-    cities = await cityModel.find();
+    var user = await userModel.findOne({userName: req.session.user.name});
 
-  res.render('weather', { title: 'Express', cityList: cities, user: req.session.user });
+  res.render('weather', { title: 'Express', cityList: user.cities, user: req.session.user });
 });
 
 router.get('/delete-city', async function(req, res, next) {
   //On demande de supprimer dans notre DB l'élément qui a l'id qu'on renvoie depuis le frontend
-  await cityModel.deleteOne({_id: req.query.id});
+  
   //Après avoir supprimé on refait un tour dans la DB pour voir de quoi elle a l'air maintenant
-  var cities = await cityModel.find();
-
-  res.render('weather', { title: 'Express', cityList: cities, user: req.session.user });
+  var user = await userModel.findOne({userName: req.session.user.name});
+  user.cities.splice(req.query.id, 1);
+  await user.save();
+  var user = await userModel.findOne({userName: req.session.user.name});
+  res.render('weather', { title: 'Express', cityList: user.cities, user: req.session.user });
 });
 
 router.get('/update-data', async function(req, res, next) {
   //On va voir dans la DB a quoi ressemble al liste de villes pour le moment
-  var cities = await cityModel.find();
+  var user = await userModel.findOne({userName: req.session.user.name});
   //On boucle sur toute la longueur
-  for (let i = 0; i < cities.length; i++) {
+  for (let i = 0; i < user.cities.length; i++) {
     //On crée une nouvelle variable updateCity qui ira chercher les nouvelles infos via l'API (on cherche via le apiID pour qu'on ait pas de probleme d'ecritures de villes avec des accents)
-    var updateCity = await request("GET", "http://api.openweathermap.org/data/2.5/weather?id=" + cities[i].apiId + "&appid=c8ba9ac0a380e95ee4626271a6cab7b1&lang=fr&units=metric");
+    var updateCity = await request("GET", "http://api.openweathermap.org/data/2.5/weather?id=" + user.cities[i].apiId + "&appid=c8ba9ac0a380e95ee4626271a6cab7b1&lang=fr&units=metric");
     //On le transforme en objet utilisable
     updateCity = JSON.parse(updateCity.body);
     //On fait la mise à jour de la ville. Le premier paramètre est celui qu'on donne pour trouver la bonne ville
-    await cityModel.updateOne({_id: cities[i]._id}, {
-      //Le deuxième parametre c'est les infos qu'on veut modifier dans cette ville
+    user.cities[i] = 
+    
+    {
+      nom: updateCity.name,
       tMax: updateCity.main.temp_max,
       tMin: updateCity.main.temp_min,
       url: "http://openweathermap.org/img/wn/" + updateCity.weather[0].icon + "@2x.png",
-      descriptif: updateCity.weather[0].description
-    });
+      descriptif: updateCity.weather[0].description,
+      apiId: updateCity.id,
+      long: updateCity.coord.lon,
+      lat: updateCity.coord.lat
+    }
+    await user.save();
   }
+  await user.save();
   //Ensuite on regarde de nouveau de quoi a l'air notre DB et on renvoie le tout au front
-  cities = await cityModel.find();
+  var user = await userModel.findOne({userName: req.session.user.name})
 
-  res.render('weather', { title: 'Express', cityList: cities, user: req.session.user});
+  res.render('weather', { title: 'Express', cityList: user.cities, user: req.session.user});
 });
 
 

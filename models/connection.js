@@ -9,7 +9,7 @@ var options = {
 
 var password = "Nini2010";
 mongoose.connect(
-    "mongodb+srv://sebParain:" + password + "@cluster0-snzfp.mongodb.net/AppWeather?retryWrites=true&w=majority",
+    "mongodb+srv://SebParain:" + password + "@cluster0-dbc2k.mongodb.net/test?retryWrites=true&w=majority",
     options,
     function(error){
         if (error) {
