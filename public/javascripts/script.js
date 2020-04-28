@@ -63,7 +63,7 @@ for (let i = 0; i < cities.length; i++) {
       var str = date.getHours();
       str += ':'+(date.getMinutes()<10?'0':'')+date.getMinutes();
       str += ':'+(date.getSeconds()<10?'0':'')+date.getSeconds();
-      testHorloge[i].innerHTML = str;
+      testHorloge[i].innerHTML = str.toString();
     }
     actualiser();
     setInterval(actualiser,1000);
