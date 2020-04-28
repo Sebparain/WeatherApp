@@ -17,7 +17,9 @@ a {
   margin-right: 15px;
 }
 
-
+.ville {
+  cursor: pointer;
+}
 
 .home {
   background-image: url('../images/weather.jpg');

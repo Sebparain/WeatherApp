@@ -61,7 +61,8 @@ router.post('/add-city', async function(req, res, next) {
         url: "http://openweathermap.org/img/wn/" + city.weather[0].icon + "@2x.png",
         apiId: city.id,
         long: city.coord.lon,
-        lat: city.coord.lat
+        lat: city.coord.lat,
+        time: city.timezone
       });
       //On l'ajoute dans notre DB
      await user.save();
@@ -103,7 +104,8 @@ router.get('/update-data', async function(req, res, next) {
       descriptif: updateCity.weather[0].description,
       apiId: updateCity.id,
       long: updateCity.coord.lon,
-      lat: updateCity.coord.lat
+      lat: updateCity.coord.lat,
+      time: updateCity.timezone
     }
     await user.save();
   }

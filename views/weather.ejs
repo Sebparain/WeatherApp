@@ -31,7 +31,7 @@
                   </div>
                 </form>
             </div>
-
+            <div id="div_horloge" class="col-lg-7"></div>
             <div class="col-12 col-lg-6">
                 <div id="worldmap"></div>
             </div>
@@ -52,8 +52,10 @@
                     <% for (let i = 0; i < cityList.length; i++) {%>
                         <div class="city" data-logo=<%=cityList[i].url%> data-long=<%=cityList[i].long%> data-lat=<%=cityList[i].lat%> data-nom=<%=cityList[i].nom%>>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span><%=cityList[i].nom%></span>
+                              <span class="ville" data-lat=<%=cityList[i].lat%> data-long=<%=cityList[i].long%>><%=cityList[i].nom%></span>
                                 <div>
+                                    <span style="color:red;" class="time" data-timezone=<%=cityList[i].time%>></span>
+                                    <span>-</span>
                                     <span><%=cityList[i].descriptif%></span>
                                     <img src=<%=cityList[i].url%> width="25px" height="25px" class="mx-1">
                                     <span class="badge badge-primary badge-pill bg-warning"><%=cityList[i].tMin%>°</span>
@@ -72,7 +74,7 @@
    </div>
 
    <!-- GRID -->
-    <script type="text/javascript" src="../javascripts/script.js"></script>
+    <script type="text/javascript" src="../javascripts/script.js">var times = <%=cityList%></script>
     <script src="https://kit.fontawesome.com/cfdae180c8.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

@@ -8,7 +8,8 @@ var citySchema = mongoose.Schema({
   url: String,
   apiId: Number,
   long: Number,
-  lat: Number
+  lat: Number,
+  time: Number,
 });
 
 var userSchema = mongoose.Schema({
